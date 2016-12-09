@@ -66,15 +66,24 @@ Example:
 
 [pin 17] - [Button] - [Ground]
 
-Controls
-========
+Controls with TTS
+=================
 
 - main: play/pause. In menu select item
 - main longpress: enter/exit menu
 - vol_up longpress: repeat last sentence
-- vol_down longpress: set the volume 0
+- vol_down longpress: mutes volume
 - next: in menu navigate to next item
 - previous: in menu navigate to next item
+
+Controls without TTS
+=================
+
+- main: play/pause
+- vol_up
+- vol_down longpress: mutes volume
+- next
+- previous
 
 Project resources
 =================
@@ -91,7 +100,8 @@ v1.1.0
 ----------------------------------------
 
 - forked original https://github.com/9and3r/mopidy-ttsgpio
-- allows configurable TTS support
+- allows configurable TTS support, skip menu if TSS disabled
+- debugging logs for GPIO events
 
 v1.0.2
 ----------------------------------------
