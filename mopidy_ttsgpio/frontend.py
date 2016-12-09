@@ -20,6 +20,7 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
         self.core = core
         self.main_menu = MainMenu(self)
 
+        self.tts_enabled = config['ttsgpio']['tts'];
         self.debug_gpio_simulate = config['ttsgpio']['debug_gpio_simulate']
         if self.debug_gpio_simulate:
             from .gpio_simulator import GpioSimulator
@@ -44,26 +45,38 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
                 self.gpio_manager.set_led(False)
 
     def input(self, input_event):
+        logger.debug("event:"+str(input_event))
         try:
             if input_event['key'] == 'volume_up':
-                if input_event['long']:
+                if input_event['long'] and self.tts_enabled:
                     self.repeat()
                 else:
-                    current = self.core.playback.volume.get()
+                    current = self.core.mixer.get_volume().get()
                     current += 10
-                    self.core.playback.volume = current
+                    if current > 100:   # do not use values over 100
+                        current = 100
+                    if (self.core.playback.get_mute().get()):
+                        self.core.mixer.set_mute(False)
+                        logger.debug("unmuted")
+                        current = 10    # initial value after unmuted
+                    self.core.mixer.set_volume(current);
+                    logger.debug("volume:"+str(current))
             elif input_event['key'] == 'volume_down':
+                current = self.core.mixer.get_volume().get()
                 if input_event['long']:
-                    current = 0
+                    self.core.mixer.set_mute(True)
+                    logger.debug("muted")
                 else:
-                    current = self.core.playback.volume.get()
                     current -= 10
-                self.core.playback.volume = current
+                    if current < 0:   # do not use negative values
+                        current = 0
+                    self.core.mixer.set_volume(current);
+                logger.debug("volume:"+str(current))
             elif input_event['key'] == 'main' and input_event['long'] \
-                    and self.menu:
+                    and self.tts_enabled and self.menu:
                 self.exit_menu()
             else:
-                if self.menu:
+                if self.menu and self.tts_enabled:
                     self.main_menu.input(input_event)
                 else:
                     self.manage_input(input_event)
@@ -77,7 +90,7 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
         elif input_event['key'] == 'previous':
             self.core.playback.previous()
         elif input_event['key'] == 'main':
-            if input_event['long']:
+            if input_event['long'] and self.tts_enabled:
                 self.menu = True
                 self.main_menu.reset()
             else:
@@ -86,6 +99,7 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
                     self.core.playback.pause()
                 else:
                     self.core.playback.play()
+                logger.debug("play status:"+self.core.playback.state.get())
 
     def repeat(self):
         if self.menu:
