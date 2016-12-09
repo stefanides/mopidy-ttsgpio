@@ -51,7 +51,10 @@ Before starting Mopidy, you must add configuration for
 Mopidy-TtsGpio to your Mopidy configuration file::
 
     [ttsgpio]
-    debug_gpio_simulate = false # Set true to emulate GPIO buttons with on screen buttons
+    # Set to false to disable TTS
+    tts = true
+    # Set true to emulate GPIO buttons with on screen buttons
+    debug_gpio_simulate = false 
     pin_button_main = 17
     pin_button_next = 22
     pin_button_previous = 23
@@ -88,10 +91,8 @@ Controls without TTS
 Project resources
 =================
 
-- `Source code <https://github.com/9and3r/mopidy-ttsgpio>`_
-- `Issue tracker <https://github.com/9and3r/mopidy-ttsgpio/issues>`_
-- `Development branch tarball <https://github.com/9and3r/mopidy-ttsgpio/archive/master.tar.gz#egg=Mopidy-TtsGpio-dev>`_
-
+- `Source code <https://github.com/stefanides/mopidy-ttsgpio>`_
+- `Original release <https://github.com/9and3r/mopidy-ttsgpio>`_
 
 Changelog
 =========
