@@ -7,7 +7,7 @@ from mopidy import config, ext
 
 
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 
 
 logger = logging.getLogger(__name__)
@@ -33,6 +33,7 @@ class Extension(ext.Extension):
         schema['pin_button_vol_down'] = config.Integer()
         schema['pin_play_led'] = config.Integer()
         schema['tts_default_volume'] = config.Integer()
+        schema['tts'] = config.Boolean()
         return schema
 
     def setup(self, registry):

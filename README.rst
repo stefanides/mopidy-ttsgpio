@@ -2,22 +2,6 @@
 Mopidy-TtsGpio
 ****************************
 
-.. image:: https://img.shields.io/pypi/v/Mopidy-TtsGpio.svg?style=flat
-    :target: https://pypi.python.org/pypi/Mopidy-TtsGpio/
-    :alt: Latest PyPI version
-
-.. image:: https://img.shields.io/pypi/dm/Mopidy-TtsGpio.svg?style=flat
-    :target: https://pypi.python.org/pypi/Mopidy-TtsGpio/
-    :alt: Number of PyPI downloads
-
-.. image:: https://img.shields.io/travis/9and3r/mopidy-ttsgpio/master.png?style=flat
-    :target: https://travis-ci.org/9and3r/mopidy-ttsgpio
-    :alt: Travis CI build status
-
-.. image:: https://img.shields.io/coveralls/9and3r/mopidy-ttsgpio/master.svg?style=flat
-   :target: https://coveralls.io/r/9and3r/mopidy-ttsgpio?branch=master
-   :alt: Test coverage
-
 Control mopidy without screen using GPIO and TTS
 
 For example if you play "Rather Be - Clean Bandit" you will hear:
@@ -102,6 +86,12 @@ Project resources
 
 Changelog
 =========
+
+v1.1.0
+----------------------------------------
+
+- forked original https://github.com/9and3r/mopidy-ttsgpio
+- allows configurable TTS support
 
 v1.0.2
 ----------------------------------------
