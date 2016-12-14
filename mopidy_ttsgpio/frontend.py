@@ -21,6 +21,7 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
         self.main_menu = MainMenu(self)
 
         self.tts_enabled = config['ttsgpio']['tts'];
+        self.playlist_1 = config['ttsgpio']['playlist_1'];
         self.debug_gpio_simulate = config['ttsgpio']['debug_gpio_simulate']
         if self.debug_gpio_simulate:
             from .gpio_simulator import GpioSimulator
@@ -52,7 +53,7 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
                     self.repeat()
                 else:
                     current = self.core.mixer.get_volume().get()
-                    current += 10
+                    current += 5
                     if current > 100:   # do not use values over 100
                         current = 100
                     if (self.core.playback.get_mute().get()):
@@ -67,7 +68,7 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
                     self.core.mixer.set_mute(True)
                     logger.debug("muted")
                 else:
-                    current -= 10
+                    current -= 5
                     if current < 0:   # do not use negative values
                         current = 0
                     self.core.mixer.set_volume(current);
@@ -75,6 +76,15 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
             elif input_event['key'] == 'main' and input_event['long'] \
                     and self.tts_enabled and self.menu:
                 self.exit_menu()
+            elif input_event['key'] == 'playlist_1':
+                list_uris = []
+                files = self.core.playlists.get_items(uri=self.playlist_1).get()
+                for ref in files:
+                    list_uris.append(ref.uri)
+                logger.debug("playlist_1:"+self.playlist_1+" contains:"+str(files))
+                self.core.tracklist.clear()
+                self.core.tracklist.add(uris=list_uris)
+                self.core.playback.play()
             else:
                 if self.menu and self.tts_enabled:
                     self.main_menu.input(input_event)
@@ -90,7 +100,9 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
         elif input_event['key'] == 'previous':
             self.core.playback.previous()
         elif input_event['key'] == 'main':
-            if input_event['long'] and self.tts_enabled:
+            if input_event['long'] and self.core.playback.state.get() == core.PlaybackState.PLAYING:
+                self.core.playback.stop()
+            elif input_event['long'] and self.tts_enabled:
                 self.menu = True
                 self.main_menu.reset()
             else:

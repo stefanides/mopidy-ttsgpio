@@ -61,6 +61,12 @@ class GPIOManager():
             GPIO.add_event_detect(pins['pin_button_main'],
                                   GPIO.BOTH, callback=self.main, bouncetime=bounce_time)
 
+            # playlist 1, only GPIO.FALLING
+            GPIO.setup(pins['pin_button_playlist_1'], GPIO.IN,
+                       pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(pins['pin_button_playlist_1'],
+                                  GPIO.FALLING, callback=self.playlist_1, bouncetime=bounce_time)
+
             self.correctlyLoaded = True
 
         except RuntimeError:
@@ -99,3 +105,6 @@ class GPIOManager():
 
     def vol_down(self, channel):
         self.handle_event(channel, 'volume_down')
+
+    def playlist_1(self, channel):
+        self.handle_event(channel, 'playlist_1')
