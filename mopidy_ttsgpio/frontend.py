@@ -35,13 +35,15 @@ class TtsGpio(pykka.ThreadingActor, core.CoreListener):
 
     def playback_state_changed(self, old_state, new_state):
         if self.debug_gpio_simulate:
-            if new_state == core.PlaybackState.PLAYING:
-                self.simulator.playing_led.select()
+            if new_state == core.PlaybackState.PLAYING \
+                or new_state == core.PlaybackState.PAUSED:
+                    self.simulator.playing_led.select()
             else:
                 self.simulator.playing_led.deselect()
         else:
-            if new_state == core.PlaybackState.PLAYING:
-                self.gpio_manager.set_led(True)
+            if new_state == core.PlaybackState.PLAYING \
+                or new_state == core.PlaybackState.PAUSED:
+                    self.gpio_manager.set_led(True)
             else:
                 self.gpio_manager.set_led(False)
 
