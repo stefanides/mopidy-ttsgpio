@@ -27,44 +27,54 @@ class GPIOManager():
         try:
             # GPIO Mode
             GPIO.setmode(GPIO.BCM)
-            GPIO.setup(self.led_pin, GPIO.OUT)
+
+            # only configures pins are going to be used
+
+            if (self.led_pin > 0):
+                GPIO.setup(self.led_pin, GPIO.OUT)
 
             # Next Button
-            GPIO.setup(pins['pin_button_next'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_next'],
-                                  GPIO.BOTH, callback=self.next, bouncetime=bounce_time)
+            if (pins['pin_button_next'] > 0):
+                GPIO.setup(pins['pin_button_next'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_next'],
+                                      GPIO.BOTH, callback=self.next, bouncetime=bounce_time)
 
             # Previous Button
-            GPIO.setup(pins['pin_button_previous'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_previous'], GPIO.BOTH,
-                                  callback=self.previous, bouncetime=bounce_time)
+            if (pins['pin_button_previous'] > 0):
+                GPIO.setup(pins['pin_button_previous'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_previous'], GPIO.BOTH,
+                                      callback=self.previous, bouncetime=bounce_time)
 
             # Volume Up Button
-            GPIO.setup(pins['pin_button_vol_up'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_vol_up'], GPIO.BOTH,
-                                  callback=self.vol_up, bouncetime=bounce_time)
+            if (pins['pin_button_vol_up'] > 0):
+                GPIO.setup(pins['pin_button_vol_up'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_vol_up'], GPIO.BOTH,
+                                      callback=self.vol_up, bouncetime=bounce_time)
 
             # Volume Down Button
-            GPIO.setup(pins['pin_button_vol_down'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_vol_down'],
-                                  GPIO.BOTH, callback=self.vol_down,
+            if (pins['pin_button_vol_down'] > 0):
+                GPIO.setup(pins['pin_button_vol_down'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_vol_down'],
+                                      GPIO.BOTH, callback=self.vol_down,
                                   bouncetime=bounce_time)
 
             # Main Button
-            GPIO.setup(pins['pin_button_main'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_main'],
-                                  GPIO.BOTH, callback=self.main, bouncetime=bounce_time)
+            if (pins['pin_button_main'] > 0):
+                GPIO.setup(pins['pin_button_main'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_main'],
+                                      GPIO.BOTH, callback=self.main, bouncetime=bounce_time)
 
             # playlist 1, only GPIO.FALLING
-            GPIO.setup(pins['pin_button_playlist_1'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_playlist_1'],
-                                  GPIO.FALLING, callback=self.playlist_1, bouncetime=bounce_time)
+            if (pins['pin_button_playlist_1'] > 0):
+                GPIO.setup(pins['pin_button_playlist_1'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_playlist_1'],
+                                      GPIO.FALLING, callback=self.playlist_1, bouncetime=bounce_time)
 
             # rotary defaults
             rotary = {}
@@ -75,28 +85,30 @@ class GPIOManager():
             self.rotary = {}
 
             # rotary encoder volume, two pins, no bounce_time
-            GPIO.setup(pins['pin_button_rotary_vol_1'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_rotary_vol_1'],
-                                  GPIO.RISING, callback=self.rotary_vol)
-            GPIO.setup(pins['pin_button_rotary_vol_2'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_rotary_vol_2'],
-                                  GPIO.RISING, callback=self.rotary_vol)
-            # rotary store value as event1
-            self.rotary['volume_up'] = rotary
+            if (pins['pin_button_rotary_vol_1'] > 0 and pins['pin_button_rotary_vol_2'] > 0):
+                GPIO.setup(pins['pin_button_rotary_vol_1'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_rotary_vol_1'],
+                                      GPIO.RISING, callback=self.rotary_vol)
+                GPIO.setup(pins['pin_button_rotary_vol_2'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_rotary_vol_2'],
+                                      GPIO.RISING, callback=self.rotary_vol)
+                # rotary store value as event1
+                self.rotary['volume_up'] = rotary
 
             # rotary encoder prev/next, two pins, no bounce_time
-            GPIO.setup(pins['pin_button_rotary_prev_next_1'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_rotary_prev_next_1'],
-                                  GPIO.RISING, callback=self.rotary_prev_next)
-            GPIO.setup(pins['pin_button_rotary_prev_next_2'], GPIO.IN,
-                       pull_up_down=GPIO.PUD_UP)
-            GPIO.add_event_detect(pins['pin_button_rotary_prev_next_2'],
-                                  GPIO.RISING, callback=self.rotary_prev_next)
-            # rotary store value as event1
-            self.rotary['next'] = rotary
+            if (pins['pin_button_rotary_prev_next_1'] > 0 and pins['pin_button_rotary_prev_next_2'] > 0):
+                GPIO.setup(pins['pin_button_rotary_prev_next_1'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_rotary_prev_next_1'],
+                                      GPIO.RISING, callback=self.rotary_prev_next)
+                GPIO.setup(pins['pin_button_rotary_prev_next_2'], GPIO.IN,
+                           pull_up_down=GPIO.PUD_UP)
+                GPIO.add_event_detect(pins['pin_button_rotary_prev_next_2'],
+                                     GPIO.RISING, callback=self.rotary_prev_next)
+                # rotary store value as event1
+                self.rotary['next'] = rotary
 
             self.correctlyLoaded = True
 
