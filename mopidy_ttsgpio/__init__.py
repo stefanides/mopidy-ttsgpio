@@ -33,6 +33,8 @@ class Extension(ext.Extension):
         schema['pin_button_vol_down'] = config.Integer()
         schema['pin_button_rotary_vol_1'] = config.Integer()
         schema['pin_button_rotary_vol_2'] = config.Integer()
+        schema['pin_button_rotary_prev_next_1'] = config.Integer()
+        schema['pin_button_rotary_prev_next_2'] = config.Integer()
         schema['pin_button_playlist_1'] = config.Integer()
         schema['playlist_1'] = config.String()
         schema['pin_play_led'] = config.Integer()

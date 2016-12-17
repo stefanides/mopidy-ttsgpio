@@ -21,6 +21,9 @@ class GPIOManager():
         # Play Led
         self.led_pin = pins['pin_play_led']
 
+        # store pins
+        self.pins = pins 
+
         try:
             # GPIO Mode
             GPIO.setmode(GPIO.BCM)
@@ -63,6 +66,14 @@ class GPIOManager():
             GPIO.add_event_detect(pins['pin_button_playlist_1'],
                                   GPIO.FALLING, callback=self.playlist_1, bouncetime=bounce_time)
 
+            # rotary defaults
+            rotary = {}
+            rotary['channel1'] = -1
+            rotary['channel2'] = -1
+            rotary['last_time'] = -1
+            rotary['last_state'] = -1
+            self.rotary = {}
+
             # rotary encoder volume, two pins, no bounce_time
             GPIO.setup(pins['pin_button_rotary_vol_1'], GPIO.IN,
                        pull_up_down=GPIO.PUD_UP)
@@ -72,13 +83,20 @@ class GPIOManager():
                        pull_up_down=GPIO.PUD_UP)
             GPIO.add_event_detect(pins['pin_button_rotary_vol_2'],
                                   GPIO.RISING, callback=self.rotary_vol)
-            # rotary store old value
-            self.rotary_channel1 = -1
-            self.rotary_channel2 = -1
-            self.rotary_pin1 = pins['pin_button_rotary_vol_1']
-            self.rotary_pin2 = pins['pin_button_rotary_vol_2']
-            self.rotary_last_time = -1 
-            self.rotary_last_state = 0
+            # rotary store value as event1
+            self.rotary['volume_up'] = rotary
+
+            # rotary encoder prev/next, two pins, no bounce_time
+            GPIO.setup(pins['pin_button_rotary_prev_next_1'], GPIO.IN,
+                       pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(pins['pin_button_rotary_prev_next_1'],
+                                  GPIO.RISING, callback=self.rotary_prev_next)
+            GPIO.setup(pins['pin_button_rotary_prev_next_2'], GPIO.IN,
+                       pull_up_down=GPIO.PUD_UP)
+            GPIO.add_event_detect(pins['pin_button_rotary_prev_next_2'],
+                                  GPIO.RISING, callback=self.rotary_prev_next)
+            # rotary store value as event1
+            self.rotary['next'] = rotary
 
             self.correctlyLoaded = True
 
@@ -111,32 +129,37 @@ class GPIOManager():
             self.frontend.input({'key': event, 'long': False})
 
     def handle_rotary_event(self, channel, channel1, channel2, event1, event2):
+        rotary_status = self.rotary[event1]
         # based on the code from https://www.raspberrypi.org/forums/viewtopic.php?f=37&t=140250
         gpio1 = GPIO.input(channel1)
         gpio2 = GPIO.input(channel2)
 
-        if gpio1 == self.rotary_channel1 and gpio2 == self.rotary_channel2:
+        if gpio1 == rotary_status['channel1'] and gpio2 == rotary_status['channel2']:
            # Same interrupt as before (Bouncing)? ignore interrupt
            return 
 
         # remember new for next bouncing check
-        self.rotary_channel1 = gpio1
-        self.rotary_channel2 = gpio2
+        self.rotary[event1]['channel1'] = gpio1
+        self.rotary[event1]['channel2'] = gpio2
 
         if (gpio1 == 1 and gpio2 == 1) or (gpio1 == 0 and gpio2 == 0):
            if (channel == channel1 and gpio1 == 1) or (channel == channel2 and gpio1 == 0):
-               if self.rotary_last_time + longpress_time < time.time() \
-                   or self.rotary_last_state == 1:   # cannot change direction too fast - bouncing?
-                       self.rotary_last_state = 1
-                       self.rotary_last_time = time.time()
-                       logger.debug("rotary "+event1+":gpio1:"+str(channel1)+":"+str(gpio1)+", gpio2:"+str(channel2)+":"+str(gpio2))
+               # cannot change direction too fast - bouncing?
+               if rotary_status['last_time'] + longpress_time < time.time() \
+                   or rotary_status['last_state'] == 1:   
+                       self.rotary[event1]['last_state'] = 1
+                       self.rotary[event1]['last_time'] = time.time()
+                       logger.debug("rotary "+event1+":gpio1:"+str(channel1)+":"+\
+                           str(gpio1)+", gpio2:"+str(channel2)+":"+str(gpio2))
                        self.frontend.input({'key': event1, 'long': False})
            else:
-               if self.rotary_last_time + longpress_time < time.time() \
-                   or self.rotary_last_state == -1:   # cannot change direction too fast - bouncing?
-                       self.rotary_last_state = -1
-                       self.rotary_last_time = time.time()
-                       logger.debug("rotary "+event2+":gpio1:"+str(channel1)+":"+str(gpio1)+", gpio2:"+str(channel2)+":"+str(gpio2))
+               # cannot change direction too fast - bouncing?
+               if rotary_status['last_time'] + longpress_time < time.time() \
+                   or rotary_status['last_state'] == -1:
+                       self.rotary[event1]['last_state'] = -1
+                       self.rotary[event1]['last_time'] = time.time()
+                       logger.debug("rotary "+event2+":gpio1:"+str(channel1)+":"+\
+                           str(gpio1)+", gpio2:"+str(channel2)+":"+str(gpio2))
                        self.frontend.input({'key': event2, 'long': False})
 
     def previous(self, channel):
@@ -158,4 +181,13 @@ class GPIOManager():
         self.handle_event(channel, 'playlist_1')
 
     def rotary_vol(self, channel):
-        self.handle_rotary_event(channel, self.rotary_pin1, self.rotary_pin2, 'volume_up', 'volume_down')
+        self.handle_rotary_event(channel,
+                                 self.pins['pin_button_rotary_vol_1'],
+                                 self.pins['pin_button_rotary_vol_2'],
+                                 'volume_up', 'volume_down')
+
+    def rotary_prev_next(self, channel):
+        self.handle_rotary_event(channel,
+                                 self.pins['pin_button_rotary_prev_next_1'],
+                                 self.pins['pin_button_rotary_prev_next_2'],
+                                 'next', 'previous')
