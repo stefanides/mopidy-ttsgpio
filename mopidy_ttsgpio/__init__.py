@@ -7,7 +7,7 @@ from mopidy import config, ext
 
 
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 
 logger = logging.getLogger(__name__)
@@ -31,6 +31,8 @@ class Extension(ext.Extension):
         schema['pin_button_previous'] = config.Integer()
         schema['pin_button_vol_up'] = config.Integer()
         schema['pin_button_vol_down'] = config.Integer()
+        schema['pin_button_rotary_vol_1'] = config.Integer()
+        schema['pin_button_rotary_vol_2'] = config.Integer()
         schema['pin_button_playlist_1'] = config.Integer()
         schema['playlist_1'] = config.String()
         schema['pin_play_led'] = config.Integer()
